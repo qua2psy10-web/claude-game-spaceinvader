@@ -3,6 +3,11 @@
 Three.js で作ったブラウザで遊べる 3D スペースインベーダーゲームです。
 自機の背後上空から見下ろす視点で、クラシックなインベーダーのルールを 3D 空間で再現しています。
 
+**▶ 今すぐ遊ぶ: https://qua2psy10-web.github.io/claude-game-spaceinvader/**
+
+スマホ(iPhone/Android)でも上記 URL を開くだけで遊べます。画面下にタッチ操作ボタンが表示されます。
+iPhone では Safari の共有メニューから「ホーム画面に追加」すると全画面のアプリ風に起動できます。
+
 ## 遊び方
 
 | 操作 | キーボード | タッチ |
@@ -29,6 +34,11 @@ npm run dev      # 開発サーバー起動 (http://localhost:5173)
 npm run build    # 本番ビルド (dist/ に出力)
 npm run preview  # ビルド結果のプレビュー
 ```
+
+### デプロイ
+
+デフォルトブランチに push すると GitHub Actions(`.github/workflows/deploy.yml`)が
+自動でビルドして GitHub Pages に公開します。
 
 ## 技術構成
 
