@@ -9,6 +9,12 @@ export class Hud {
     this.titleEl = document.getElementById('overlay-title');
     this.msgEl = document.getElementById('overlay-msg');
     this.subEl = document.getElementById('overlay-sub');
+    this.muteEl = document.getElementById('btn-mute');
+  }
+
+  setMuted(muted) {
+    this.muteEl.textContent = muted ? '🔇' : '🔊';
+    this.muteEl.classList.toggle('muted', muted);
   }
 
   setScore(score) {

@@ -68,6 +68,22 @@
       text-shadow: 0 0 16px rgba(255, 111, 156, 0.9);
     }
 
+    /* ---- Mute button ---- */
+    #btn-mute {
+      position: fixed;
+      top: 74px; right: 18px;
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      border: 1px solid rgba(125, 255, 176, 0.5);
+      background: rgba(125, 255, 176, 0.08);
+      font-size: 20px;
+      line-height: 1;
+      cursor: pointer;
+      z-index: 40;
+      touch-action: none;
+    }
+    #btn-mute.muted { opacity: 0.45; }
+
     /* ---- Touch controls ---- */
     #touch-ui {
       position: fixed; bottom: 0; left: 0; right: 0;
@@ -120,6 +136,8 @@
       <div class="value" id="lives">▲ ▲ ▲</div>
     </div>
   </div>
+
+  <button id="btn-mute" aria-label="サウンド ON/OFF">🔊</button>
 
   <div id="overlay">
     <h1 id="overlay-title">3D SPACE INVADERS</h1>

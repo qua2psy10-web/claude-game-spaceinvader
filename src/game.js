@@ -4,6 +4,7 @@ import { InvaderFleet } from './invaders.js';
 import { Projectiles } from './projectiles.js';
 import { Effects } from './effects.js';
 import { AudioFX } from './audio.js';
+import { Music } from './music.js';
 import { Hud } from './hud.js';
 import { Input } from './input.js';
 import {
@@ -26,10 +27,14 @@ export class Game {
     this.projectiles = new Projectiles(scene);
     this.effects = new Effects(scene, camera, cameraBasePos);
     this.audio = new AudioFX();
+    this.music = new Music(this.audio);
     this.hud = new Hud();
     this.input = new Input();
     this.input.onFirstInteraction = () => this.audio.init();
+    this.input.onMuteToggle = () => this.toggleMute();
     this.fleet.onStep = () => this.audio.fleetStep();
+    this.hud.setMuted(this.audio.muted);
+    this.bindMuteButton();
 
     this.state = 'title';
     this.score = 0;
@@ -59,6 +64,7 @@ export class Game {
 
     this.input.update();
     this.update(dt);
+    this.music.update();
     this.sceneManager.update(dt);
     this.effects.update(dt);
     this.sceneManager.render();
@@ -101,6 +107,22 @@ export class Game {
     this.hud.setLives(this.lives);
     this.hud.setWave(this.wave);
     this.hud.hideOverlay();
+    this.music.start();
+  }
+
+  // ミュートボタン。タップが window の pointerdown(ゲーム開始判定)に
+  // 伝播しないよう止める
+  bindMuteButton() {
+    const btn = document.getElementById('btn-mute');
+    btn.addEventListener('pointerdown', (e) => e.stopPropagation());
+    btn.addEventListener('click', () => {
+      this.audio.init();
+      this.toggleMute();
+    });
+  }
+
+  toggleMute() {
+    this.hud.setMuted(this.audio.toggleMute());
   }
 
   updatePlaying(dt) {
@@ -124,6 +146,11 @@ export class Game {
 
     this.updateEnemyFire(dt);
     this.checkCollisions();
+
+    // 敵が減るほど・ウェーブが進むほど BGM のテンポを上げる
+    const total = this.fleet.invaders.length || 1;
+    const aliveRatio = this.fleet.aliveCount / total;
+    this.music.setIntensity((1 - aliveRatio) * 0.8 + (this.wave - 1) * 0.15);
 
     // 編隊が自機ラインまで前進したら即ゲームオーバー(原作の侵略ルール)
     if (this.fleet.frontZ >= INVASION_Z) {
@@ -211,6 +238,7 @@ export class Game {
   gameOver() {
     this.state = 'gameover';
     this.restartLockout = 1.0;
+    this.music.stop();
     this.audio.gameOver();
     const isNewRecord =
       this.score > 0 &&

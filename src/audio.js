@@ -1,9 +1,13 @@
 // Web Audio API のオシレーター/ノイズだけで合成する効果音。外部ファイル不使用。
+const MASTER_VOLUME = 0.35;
+const MUTE_KEY = 'si3d-muted';
+
 export class AudioFX {
   constructor() {
     this.ctx = null;
     this.master = null;
     this.stepIndex = 0;
+    this.muted = localStorage.getItem(MUTE_KEY) === '1';
   }
 
   // ブラウザの自動再生制限があるため、最初のユーザー操作後に呼ぶ
@@ -16,8 +20,18 @@ export class AudioFX {
     if (!Ctx) return;
     this.ctx = new Ctx();
     this.master = this.ctx.createGain();
-    this.master.gain.value = 0.35;
+    this.master.gain.value = this.muted ? 0 : MASTER_VOLUME;
     this.master.connect(this.ctx.destination);
+  }
+
+  // BGM/効果音を一括でミュート切替し、設定を保存する。現在の状態を返す
+  toggleMute() {
+    this.muted = !this.muted;
+    localStorage.setItem(MUTE_KEY, this.muted ? '1' : '0');
+    if (this.master) {
+      this.master.gain.value = this.muted ? 0 : MASTER_VOLUME;
+    }
+    return this.muted;
   }
 
   tone({ freq, endFreq, type = 'square', duration = 0.1, volume = 0.5, delay = 0 }) {

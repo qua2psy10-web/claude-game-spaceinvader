@@ -10,6 +10,7 @@ export class Input {
     this.firePressed = false;
     this._firePressQueued = false;
     this.onFirstInteraction = null;
+    this.onMuteToggle = null;
     this._interacted = false;
     // タイトル/ゲームオーバー画面での「開始操作」(スペース or 画面タップ)
     this._startQueued = false;
@@ -58,6 +59,13 @@ export class Input {
           this._startQueued = true;
         }
         e.preventDefault();
+        break;
+      case 'KeyM':
+        if (down && !e.repeat) {
+          // AudioContext の生成(初回操作)を先に済ませてからトグルする
+          this.markInteraction();
+          if (this.onMuteToggle) this.onMuteToggle();
+        }
         break;
       default:
         return;
