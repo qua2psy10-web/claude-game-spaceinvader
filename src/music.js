@@ -43,7 +43,7 @@ export class Music {
     const ctx = this.fx.ctx;
     if (!ctx || this.gain) return;
     this.gain = ctx.createGain();
-    this.gain.gain.value = 0.5;
+    this.gain.gain.value = 1.0;
     this.gain.connect(this.fx.master);
 
     const length = Math.floor(ctx.sampleRate * 0.05);
@@ -89,15 +89,15 @@ export class Music {
   scheduleStep(step, t, stepDur) {
     const bass = BASS[step];
     if (bass !== null) {
-      this.note(bass, t, stepDur * 1.8, 'triangle', 0.5);
+      this.note(bass, t, stepDur * 1.8, 'triangle', 0.6);
     }
     const lead = LEAD[step];
     if (lead !== null) {
-      this.note(lead, t, stepDur * 1.5, 'square', 0.16);
+      this.note(lead, t, stepDur * 1.5, 'square', 0.28);
     }
     // ハイハット: 8 分刻み、4 分の頭にアクセント
     if (step % 2 === 0) {
-      this.hat(t, step % 4 === 0 ? 0.14 : 0.07);
+      this.hat(t, step % 4 === 0 ? 0.16 : 0.08);
     }
   }
 

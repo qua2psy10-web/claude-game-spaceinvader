@@ -72,7 +72,7 @@ export class AudioFX {
   }
 
   shoot() {
-    this.tone({ freq: 900, endFreq: 220, type: 'square', duration: 0.12, volume: 0.35 });
+    this.tone({ freq: 900, endFreq: 220, type: 'square', duration: 0.12, volume: 0.3 });
   }
 
   invaderKilled() {
@@ -88,11 +88,12 @@ export class AudioFX {
   // 原作の「ズン、ズン」という編隊移動の 4 音ループ
   fleetStep() {
     const notes = [110, 104, 98, 92];
+    // BGM のベース(A2 = 110Hz)と同じ帯域なので控えめにしてマスキングを避ける
     this.tone({
       freq: notes[this.stepIndex],
       type: 'triangle',
       duration: 0.09,
-      volume: 0.5,
+      volume: 0.3,
     });
     this.stepIndex = (this.stepIndex + 1) % notes.length;
   }
