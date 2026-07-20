@@ -10,11 +10,18 @@ export class Hud {
     this.msgEl = document.getElementById('overlay-msg');
     this.subEl = document.getElementById('overlay-sub');
     this.muteEl = document.getElementById('btn-mute');
+    this.diffBtns = Array.from(document.querySelectorAll('.diff-btn'));
   }
 
   setMuted(muted) {
     this.muteEl.textContent = muted ? '🔇' : '🔊';
     this.muteEl.classList.toggle('muted', muted);
+  }
+
+  setDifficulty(name) {
+    for (const btn of this.diffBtns) {
+      btn.classList.toggle('selected', btn.dataset.diff === name);
+    }
   }
 
   setScore(score) {

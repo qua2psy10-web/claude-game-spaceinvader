@@ -24,13 +24,15 @@ export class InvaderFleet {
     this.direction = 1;
     this.stepTimer = 0;
     this.speedScale = 1;
+    this.difficultySpeed = 1; // 難易度による速度倍率
     this.onStep = null; // 移動音用コールバック
   }
 
-  spawn(wave) {
+  spawn(wave, speedMult = 1) {
     this.clear();
     this.direction = 1;
     this.stepTimer = 0;
+    this.difficultySpeed = speedMult;
     // ウェーブが進むごとに全体を速く、開始位置を少し手前にする
     this.speedScale = 1 + (wave - 1) * 0.15;
     const startZ = INVADER_START_Z + Math.min(wave - 1, 4) * 0.8;
@@ -132,7 +134,7 @@ export class InvaderFleet {
       INVADER_STEP_INTERVAL_MAX,
       ratio,
     );
-    return interval / this.speedScale;
+    return interval / this.speedScale / this.difficultySpeed;
   }
 
   // 編隊の最前線(自機に最も近い)Z 座標

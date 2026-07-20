@@ -70,6 +70,39 @@
       color: #ff6f9c;
       text-shadow: 0 0 16px rgba(255, 111, 156, 0.9);
     }
+    /* ---- Difficulty selector ---- */
+    #difficulty {
+      display: flex;
+      gap: 12px;
+      margin-top: 4px;
+      pointer-events: auto;
+    }
+    #overlay.hidden #difficulty { display: none; }
+    .diff-btn {
+      padding: 8px 18px;
+      border-radius: 8px;
+      border: 1px solid rgba(125, 255, 176, 0.4);
+      background: rgba(125, 255, 176, 0.06);
+      color: #7dffb0;
+      font-family: inherit;
+      font-size: clamp(13px, 2.6vw, 18px);
+      letter-spacing: 0.12em;
+      cursor: pointer;
+      opacity: 0.55;
+      transition: opacity 0.15s, background 0.15s, box-shadow 0.15s;
+    }
+    .diff-btn.selected {
+      opacity: 1;
+      background: rgba(125, 255, 176, 0.22);
+      box-shadow: 0 0 16px rgba(125, 255, 176, 0.6);
+    }
+    #difficulty .diff-hint {
+      align-self: center;
+      font-size: clamp(10px, 2vw, 13px);
+      color: #6fd6ff;
+      opacity: 0.75;
+      pointer-events: none;
+    }
 
     /* ---- Mute button ---- */
     #btn-mute {
@@ -145,6 +178,11 @@
   <div id="overlay">
     <h1 id="overlay-title">3D SPACE INVADERS</h1>
     <div class="msg" id="overlay-msg"></div>
+    <div id="difficulty">
+      <button class="diff-btn" data-diff="EASY">EASY</button>
+      <button class="diff-btn" data-diff="NORMAL">NORMAL</button>
+      <button class="diff-btn" data-diff="HARD">HARD</button>
+    </div>
     <div class="sub blink" id="overlay-sub">PRESS SPACE OR TAP TO START</div>
   </div>
 

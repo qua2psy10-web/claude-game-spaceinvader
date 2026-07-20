@@ -13,9 +13,13 @@ import {
   INVASION_Z,
   START_LIVES,
   WAVE_CLEAR_DELAY,
+  DIFFICULTIES,
+  DIFFICULTY_ORDER,
+  DEFAULT_DIFFICULTY,
 } from './constants.js';
 
 const HISCORE_KEY = 'si3d-hiscore';
+const DIFFICULTY_KEY = 'si3d-difficulty';
 
 // 状態機械(title / playing / gameover)と各モジュールの統括
 export class Game {
@@ -35,6 +39,12 @@ export class Game {
     this.fleet.onStep = () => this.audio.fleetStep();
     this.hud.setMuted(this.audio.muted);
     this.bindMuteButton();
+
+    // 難易度(localStorage から復元、未知の値は既定へフォールバック)
+    const savedDiff = localStorage.getItem(DIFFICULTY_KEY);
+    this.difficulty = DIFFICULTIES[savedDiff] ? savedDiff : DEFAULT_DIFFICULTY;
+    this.bindDifficultyButtons();
+    this.hud.setDifficulty(this.difficulty);
 
     this.state = 'title';
     this.score = 0;
@@ -81,6 +91,9 @@ export class Game {
         if (this.fleet.frontZ >= INVASION_Z || this.fleet.aliveCount === 0) {
           this.fleet.spawn(1);
         }
+        // ←→ で難易度選択を移動
+        const dir = this.input.consumeMenu();
+        if (dir) this.cycleDifficulty(dir);
         if (this.restartLockout > 0) {
           this.restartLockout -= dt;
           this.input.consumeStart();
@@ -102,7 +115,7 @@ export class Game {
     this.waveClearTimer = 0;
     this.player.reset();
     this.projectiles.clearAll();
-    this.fleet.spawn(this.wave);
+    this.fleet.spawn(this.wave, DIFFICULTIES[this.difficulty].speed);
     this.hud.setScore(this.score);
     this.hud.setLives(this.lives);
     this.hud.setWave(this.wave);
@@ -123,6 +136,33 @@ export class Game {
 
   toggleMute() {
     this.hud.setMuted(this.audio.toggleMute());
+  }
+
+  // タイトルの難易度ボタン。クリックで選択し、そのまま開始フローに乗せる
+  // (ミュートボタンと違い伝播は止めない = window の開始判定が働く)
+  bindDifficultyButtons() {
+    for (const name of DIFFICULTY_ORDER) {
+      const btn = document.querySelector(`.diff-btn[data-diff="${name}"]`);
+      if (!btn) continue;
+      btn.addEventListener('pointerdown', () => {
+        if (this.state === 'playing') return;
+        this.setDifficulty(name);
+      });
+    }
+  }
+
+  setDifficulty(name) {
+    if (!DIFFICULTIES[name]) return;
+    this.difficulty = name;
+    localStorage.setItem(DIFFICULTY_KEY, name);
+    this.hud.setDifficulty(name);
+  }
+
+  cycleDifficulty(dir) {
+    const i = DIFFICULTY_ORDER.indexOf(this.difficulty);
+    const next =
+      (i + dir + DIFFICULTY_ORDER.length) % DIFFICULTY_ORDER.length;
+    this.setDifficulty(DIFFICULTY_ORDER[next]);
   }
 
   updatePlaying(dt) {
@@ -167,7 +207,7 @@ export class Game {
         this.wave += 1;
         this.hud.setWave(this.wave);
         this.projectiles.clearEnemyBullets();
-        this.fleet.spawn(this.wave);
+        this.fleet.spawn(this.wave, DIFFICULTIES[this.difficulty].speed);
       }
     }
   }
@@ -175,8 +215,11 @@ export class Game {
   updateEnemyFire(dt) {
     const shooters = this.fleet.frontLine();
     if (shooters.length === 0) return;
-    // ウェーブと残数の少なさに応じて攻撃頻度を上げる
-    const rate = INVADER_FIRE_RATE * (1 + (this.wave - 1) * 0.25);
+    // ウェーブと残数の少なさ、および難易度に応じて攻撃頻度を上げる
+    const rate =
+      INVADER_FIRE_RATE *
+      (1 + (this.wave - 1) * 0.25) *
+      DIFFICULTIES[this.difficulty].fire;
     if (Math.random() < rate * dt) {
       const shooter = shooters[Math.floor(Math.random() * shooters.length)];
       this.projectiles.fireEnemyBullet(shooter.mesh.position);
@@ -238,6 +281,9 @@ export class Game {
   gameOver() {
     this.state = 'gameover';
     this.restartLockout = 1.0;
+    // プレイ中の左右移動で溜まったメニュー入力を捨て、
+    // ゲームオーバー直後に難易度が勝手に動かないようにする
+    this.input.consumeMenu();
     this.music.stop();
     this.audio.gameOver();
     const isNewRecord =

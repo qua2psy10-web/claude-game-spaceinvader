@@ -25,6 +25,16 @@ export const INVASION_Z = PLAYER_Z - 2.5;
 export const START_LIVES = 3;
 export const WAVE_CLEAR_DELAY = 2.0;
 
+// 難易度。speed = 敵ステップ間隔の短縮倍率(大きいほど速い)、
+// fire = 敵弾レートの倍率。NORMAL が従来のバランス。残機・スコアは共通
+export const DIFFICULTIES = {
+  EASY: { label: 'EASY', speed: 0.7, fire: 0.6 },
+  NORMAL: { label: 'NORMAL', speed: 1.0, fire: 1.0 },
+  HARD: { label: 'HARD', speed: 1.45, fire: 1.7 },
+};
+export const DIFFICULTY_ORDER = ['EASY', 'NORMAL', 'HARD'];
+export const DEFAULT_DIFFICULTY = 'NORMAL';
+
 // 行ごとの敵タイプ: [最上段, ..., 最下段] → 点数
 export const INVADER_TYPES = [
   { score: 30, color: 0xff5fd0 }, // squid

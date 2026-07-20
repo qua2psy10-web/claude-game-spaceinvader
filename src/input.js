@@ -14,6 +14,8 @@ export class Input {
     this._interacted = false;
     // タイトル/ゲームオーバー画面での「開始操作」(スペース or 画面タップ)
     this._startQueued = false;
+    // メニュー(難易度選択)の ←→ 押下エッジを溜める
+    this._menuDir = 0;
 
     window.addEventListener('keydown', (e) => this.onKey(e, true));
     window.addEventListener('keyup', (e) => this.onKey(e, false));
@@ -44,10 +46,12 @@ export class Input {
       case 'ArrowLeft':
       case 'KeyA':
         this.left = down;
+        if (down && !e.repeat) this._menuDir = -1;
         break;
       case 'ArrowRight':
       case 'KeyD':
         this.right = down;
+        if (down && !e.repeat) this._menuDir = 1;
         break;
       case 'Space':
       case 'ArrowUp':
@@ -111,5 +115,12 @@ export class Input {
     const queued = this._startQueued;
     this._startQueued = false;
     return queued;
+  }
+
+  // メニューの左右移動(-1 / 0 / +1)を返してフラグを消費する
+  consumeMenu() {
+    const dir = this._menuDir;
+    this._menuDir = 0;
+    return dir;
   }
 }
